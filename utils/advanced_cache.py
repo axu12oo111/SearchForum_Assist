@@ -180,38 +180,54 @@ class AdvancedCache:
             self._stats['invalidations'] += 1
     
     async def invalidate_pattern(self, pattern: str) -> int:
-        """使匹配模式的所有缓存项失效
+        """使匹配模式的所有缓存项失效. 使用 SCAN 替代 KEYS 命令.
         
         Args:
-            pattern: 匹配模式(如'user_*'删除所有以user_开头的键)
+            pattern: 匹配模式(如\'user_*\'删除所有以user_开头的键)
             
         Returns:
-            删除的项数
+            删除的项数 (内存中的项数 + Redis中的项数)
         """
-        count = 0
         
-        # 清理内存缓存
+        mem_deleted_count = 0
+        redis_deleted_count = 0
+        
         async with self._lock:
-            matching_keys = [k for k in self._memory_cache.keys() if pattern in k]
-            for key in matching_keys:
+            # Invalidate from memory cache
+            # Create a list of keys to delete to avoid issues with modifying dict during iteration
+            mem_keys_to_delete = [k for k in self._memory_cache.keys() if pattern in k]
+            for key in mem_keys_to_delete:
                 del self._memory_cache[key]
-                count += 1
-        
-            # 清理Redis缓存
+                mem_deleted_count += 1
+            
+            # Invalidate from Redis cache
             if self._use_redis and (self._redis_available or self._check_redis_connection()):
                 try:
-                    # 查找匹配的Redis键
-                    redis_keys = self._redis.keys(f"*{pattern}*")
-                    if redis_keys:
-                        self._redis.delete(*redis_keys)
-                        count += len(redis_keys)
+                    # Using scan_iter as requested.
+                    # list() will consume the generator from scan_iter.
+                    # This operation, and delete below, are synchronous and will block the event loop.
+                    keys_from_redis_to_delete = list(self._redis.scan_iter(match=f"*{pattern}*"))
+                    
+                    if keys_from_redis_to_delete:
+                        # self._redis.delete returns the number of keys that were removed.
+                        num_deleted_in_redis = self._redis.delete(*keys_from_redis_to_delete)
+                        redis_deleted_count += num_deleted_in_redis
+                        
                 except Exception as e:
-                    self._redis_available = False
-                    self._logger.error(f"Redis模式删除错误: {e}")
-        
-            self._stats['invalidations'] += count
-            self._logger.info(f"模式'{pattern}'缓存清理: {count}项")
-            return count
+                    self._redis_available = False # Ensure this is set under lock
+                    self._logger.error(f"Redis模式删除错误 (using SCAN): {e}")
+
+            total_deleted_count = mem_deleted_count + redis_deleted_count
+            
+            if total_deleted_count > 0:
+                self._stats['invalidations'] += total_deleted_count
+            
+            self._logger.info(
+                f"模式\'{pattern}\'缓存清理: {total_deleted_count}项 "
+                f"(内存: {mem_deleted_count}, Redis: {redis_deleted_count})"
+            )
+            
+        return total_deleted_count
     
     async def cleanup(self) -> int:
         """清理过期项
