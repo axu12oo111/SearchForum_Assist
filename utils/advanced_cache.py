@@ -41,15 +41,48 @@ class AdvancedCache:
             'items_cleaned': 0,
             'last_cleanup': time.time()
         }
+        self._redis = None
+        self._redis_available = False
+        self._redis_last_check = 0
+        self._redis_check_interval = 60  # 重试间隔(秒)
         
         # Redis连接设置
         if use_redis:
-            try:
-                self._redis = redis.from_url(redis_url or "redis://localhost:6379/0")
-                self._logger.info(f"Redis缓存已初始化: {redis_url}")
-            except Exception as e:
-                self._logger.error(f"Redis连接失败，将使用内存缓存: {e}")
-                self._use_redis = False
+            self._connect_to_redis(redis_url)
+    
+    def _connect_to_redis(self, redis_url=None):
+        """尝试连接到Redis服务器"""
+        if not self._use_redis:
+            return False
+            
+        try:
+            self._redis = redis.from_url(redis_url or "redis://localhost:6379/0")
+            # 测试连接是否有效
+            self._redis.ping()
+            self._redis_available = True
+            self._logger.info(f"Redis缓存已初始化: {redis_url}")
+            return True
+        except Exception as e:
+            self._redis_available = False
+            self._logger.warning(f"Redis连接失败，将使用内存缓存: {e}")
+            return False
+    
+    def _check_redis_connection(self):
+        """检查Redis连接状态，必要时尝试重连"""
+        current_time = time.time()
+        
+        # 如果Redis未启用或已连接，或者上次检查时间未到，则跳过
+        if (not self._use_redis or 
+            self._redis_available or 
+            current_time - self._redis_last_check < self._redis_check_interval):
+            return self._redis_available
+        
+        # 尝试重新连接
+        self._redis_last_check = current_time
+        if self._connect_to_redis():
+            self._logger.info("Redis连接已恢复")
+            return True
+        return False
     
     async def get(self, key: str) -> Optional[Any]:
         """获取缓存项
@@ -74,8 +107,8 @@ class AdvancedCache:
                     # 过期数据清理
                     del self._memory_cache[key]
             
-            # 如果启用Redis，从Redis获取
-            if self._use_redis:
+            # 如果启用Redis且连接可用，从Redis获取
+            if self._use_redis and (self._redis_available or self._check_redis_connection()):
                 try:
                     data = self._redis.get(key)
                     if data:
@@ -89,7 +122,8 @@ class AdvancedCache:
                         }
                         return decoded_data
                 except Exception as e:
-                    self._logger.error(f"Redis读取错误: {e}")
+                    self._redis_available = False
+                    self._logger.error(f"Redis读取错误，切换到内存缓存: {e}")
             
             self._stats['misses'] += 1
             return None
@@ -114,13 +148,14 @@ class AdvancedCache:
                 'timestamp': current_time
             }
             
-            # 如果启用Redis，同时更新Redis
-            if self._use_redis:
+            # 如果启用Redis且连接可用，同时更新Redis
+            if self._use_redis and (self._redis_available or self._check_redis_connection()):
                 try:
                     pickled_data = pickle.dumps(data)
                     self._redis.setex(key, self._ttl, pickled_data)
                 except Exception as e:
-                    self._logger.error(f"Redis写入错误: {e}")
+                    self._redis_available = False
+                    self._logger.error(f"Redis写入错误，仅使用内存缓存: {e}")
             
             self._stats['sets'] += 1
     
@@ -134,10 +169,12 @@ class AdvancedCache:
             if key in self._memory_cache:
                 del self._memory_cache[key]
             
-            if self._use_redis:
+            # 如果启用Redis且连接可用，同时从Redis删除
+            if self._use_redis and (self._redis_available or self._check_redis_connection()):
                 try:
                     self._redis.delete(key)
                 except Exception as e:
+                    self._redis_available = False
                     self._logger.error(f"Redis删除错误: {e}")
             
             self._stats['invalidations'] += 1
@@ -160,20 +197,21 @@ class AdvancedCache:
                 del self._memory_cache[key]
                 count += 1
         
-        # 清理Redis缓存
-        if self._use_redis:
-            try:
-                # 查找匹配的Redis键
-                redis_keys = self._redis.keys(f"*{pattern}*")
-                if redis_keys:
-                    self._redis.delete(*redis_keys)
-                    count += len(redis_keys)
-            except Exception as e:
-                self._logger.error(f"Redis模式删除错误: {e}")
+            # 清理Redis缓存
+            if self._use_redis and (self._redis_available or self._check_redis_connection()):
+                try:
+                    # 查找匹配的Redis键
+                    redis_keys = self._redis.keys(f"*{pattern}*")
+                    if redis_keys:
+                        self._redis.delete(*redis_keys)
+                        count += len(redis_keys)
+                except Exception as e:
+                    self._redis_available = False
+                    self._logger.error(f"Redis模式删除错误: {e}")
         
-        self._stats['invalidations'] += count
-        self._logger.info(f"模式'{pattern}'缓存清理: {count}项")
-        return count
+            self._stats['invalidations'] += count
+            self._logger.info(f"模式'{pattern}'缓存清理: {count}项")
+            return count
     
     async def cleanup(self) -> int:
         """清理过期项
@@ -232,6 +270,11 @@ class AdvancedCache:
             try:
                 cleaned = await self.cleanup()
                 self._logger.debug(f"自动缓存清理完成: {cleaned}项")
+                
+                # 定期检查Redis连接
+                if self._use_redis and not self._redis_available:
+                    if self._check_redis_connection():
+                        self._logger.info("Redis连接已恢复，重新启用Redis缓存")
             except Exception as e:
                 self._logger.error(f"缓存清理错误: {e}")
     
@@ -258,6 +301,7 @@ class AdvancedCache:
             'items_cleaned': self._stats['items_cleaned'],
             'last_cleanup': datetime.fromtimestamp(self._stats['last_cleanup']).strftime('%Y-%m-%d %H:%M:%S'),
             'use_redis': self._use_redis,
+            'redis_available': self._redis_available,
             'ttl': self._ttl
         }
 
