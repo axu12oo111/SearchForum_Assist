@@ -145,7 +145,7 @@ sudo systemctl stop discord-bot
 sudo nano /etc/logrotate.d/discord-bot
 ```
 
-```
+```text
 /opt/discord-bot/logs/*.log {
     daily
     missingok
@@ -555,54 +555,59 @@ echo "$(date): Backup completed" >> /var/log/discord-bot-backup.log
 ### 常见问题
 
 1. **服务启动失败**
-```bash
-# 检查服务状态
-sudo systemctl status discord-bot
 
-# 查看详细日志
-sudo journalctl -u discord-bot -n 50
+   ```bash
+   # 检查服务状态
+   sudo systemctl status discord-bot
 
-# 检查配置文件
-sudo systemctl cat discord-bot
-```
+   # 查看详细日志
+   sudo journalctl -u discord-bot -n 50
+
+   # 检查配置文件
+   sudo systemctl cat discord-bot
+   ```
 
 2. **权限问题**
-```bash
-# 检查文件权限
-ls -la /opt/discord-bot/
 
-# 修复权限
-sudo chown -R discord-bot:discord-bot /opt/discord-bot/
-sudo chmod -R 755 /opt/discord-bot/
-```
+   ```bash
+   # 检查文件权限
+   ls -la /opt/discord-bot/
+
+   # 修复权限
+   sudo chown -R discord-bot:discord-bot /opt/discord-bot/
+   sudo chmod -R 755 /opt/discord-bot/
+   ```
 
 3. **Docker容器问题**
-```bash
-# 检查容器状态
-docker ps -a
 
-# 查看容器日志
-docker logs discord-bot
+   ```bash
+   # 检查容器状态
+   docker ps -a
 
-# 进入容器调试
-docker exec -it discord-bot bash
-```
+   # 查看容器日志
+   docker logs discord-bot
+
+   # 进入容器调试
+   docker exec -it discord-bot bash
+   ```
 
 ### 性能优化
 
 1. **系统级优化**
-```bash
-# 增加文件描述符限制
-echo "discord-bot soft nofile 65536" >> /etc/security/limits.conf
-echo "discord-bot hard nofile 65536" >> /etc/security/limits.conf
-```
+
+   ```bash
+   # 增加文件描述符限制
+   echo "discord-bot soft nofile 65536" >> /etc/security/limits.conf
+   echo "discord-bot hard nofile 65536" >> /etc/security/limits.conf
+   ```
 
 2. **Docker优化**
-```bash
-# 使用多阶段构建减小镜像大小
-# 启用BuildKit
-export DOCKER_BUILDKIT=1
-docker build --target production -t discord-bot .
-```
+
+   ```bash
+   # 使用多阶段构建减小镜像大小
+   # 启用BuildKit
+   export DOCKER_BUILDKIT=1
+   docker build --target production -t discord-bot .
+   ```
 
 这些配置提供了完整的生产环境部署方案，包括安全性、可靠性和可维护性的考虑。

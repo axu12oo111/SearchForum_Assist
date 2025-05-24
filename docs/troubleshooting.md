@@ -5,11 +5,13 @@
 ### 1. 机器人无法启动
 
 #### 症状
+
 - 服务启动失败
 - 机器人在Discord中显示离线
 - 启动时出现错误信息
 
 #### 诊断步骤
+
 ```bash
 # 1. 检查服务状态
 sudo systemctl status discord-bot
@@ -25,7 +27,8 @@ python main.py
 
 #### 常见原因及解决方案
 
-**A. Discord Token无效**
+##### Discord Token无效
+
 ```bash
 # 检查环境变量
 echo $DISCORD_TOKEN
@@ -37,7 +40,8 @@ echo $DISCORD_TOKEN
 # 3. 更新 .env 文件
 ```
 
-**B. Python依赖问题**
+##### Python依赖问题
+
 ```bash
 # 检查Python版本
 python --version  # 应该是 3.11+
@@ -49,7 +53,8 @@ pip install -r requirements.txt --force-reinstall
 pip show discord.py
 ```
 
-**C. 权限问题**
+##### 权限问题
+
 ```bash
 # 检查文件权限
 ls -la /opt/discord-bot/
@@ -61,12 +66,14 @@ sudo chmod +x /opt/discord-bot/main.py
 
 ### 2. 搜索功能异常
 
-#### 症状
+#### 搜索异常症状
+
 - 搜索命令无响应
 - 搜索结果为空
 - 搜索超时
 
-#### 诊断步骤
+#### 搜索问题诊断
+
 ```bash
 # 1. 检查搜索相关日志
 grep "Search command" /opt/discord-bot/logs/discord_bot.log | tail -10
@@ -80,7 +87,8 @@ grep "rate limit" /opt/discord-bot/logs/discord_bot.log | tail -5
 
 #### 解决方案
 
-**A. 并发限制过低**
+##### 并发限制过低
+
 ```python
 # 编辑 config/large_server.py
 CONCURRENT_SEARCH_LIMIT = 8  # 增加并发数
@@ -90,7 +98,8 @@ GUILD_CONCURRENT_SEARCHES = 5  # 增加服务器并发数
 sudo systemctl restart discord-bot
 ```
 
-**B. 缓存问题**
+##### 缓存问题
+
 ```bash
 # 清理缓存
 redis-cli FLUSHDB  # 如果使用Redis
@@ -99,7 +108,8 @@ redis-cli FLUSHDB  # 如果使用Redis
 sudo systemctl restart discord-bot
 ```
 
-**C. Discord API权限不足**
+##### Discord API权限不足
+
 ```bash
 # 检查机器人权限:
 # - Read Message History
@@ -110,14 +120,16 @@ sudo systemctl restart discord-bot
 
 ### 3. 缓存系统问题
 
-#### 症状
+#### 缓存异常症状
+
 - 缓存命中率低
 - Redis连接失败
 - 内存使用过高
 
 #### Redis连接问题
 
-**诊断**
+##### Redis连接诊断
+
 ```bash
 # 检查Redis服务状态
 sudo systemctl status redis-server
@@ -129,7 +141,8 @@ redis-cli ping
 sudo journalctl -u redis-server --since "10 minutes ago"
 ```
 
-**解决方案**
+##### Redis连接解决方案
+
 ```bash
 # 重启Redis服务
 sudo systemctl restart redis-server
@@ -145,7 +158,8 @@ sudo nano /etc/redis/redis.conf
 
 #### 内存缓存问题
 
-**诊断**
+##### 内存缓存诊断
+
 ```bash
 # 检查缓存统计
 # 在Discord中使用: /bot_stats
@@ -154,7 +168,8 @@ sudo nano /etc/redis/redis.conf
 ps aux | grep "python main.py"
 ```
 
-**解决方案**
+##### 内存缓存解决方案
+
 ```python
 # 调整缓存配置 config/settings.py
 cache.thread_cache_size = 1000  # 减少缓存大小
@@ -164,12 +179,14 @@ cache.max_items = 5000  # 减少最大项数
 
 ### 4. 性能问题
 
-#### 症状
+#### 性能异常症状
+
 - 响应时间慢
 - 高CPU使用率
 - 内存泄漏
 
 #### 诊断工具
+
 ```bash
 # 1. 系统资源监控
 htop
@@ -188,7 +205,8 @@ iotop -p $(pgrep -f "python main.py")
 
 #### 性能优化
 
-**A. CPU使用率高**
+##### CPU使用率高
+
 ```python
 # 减少并发搜索数量
 CONCURRENT_SEARCH_LIMIT = 3
@@ -200,7 +218,8 @@ SEARCH_TIMEOUT = 30.0
 MAX_MESSAGES_PER_SEARCH = 500
 ```
 
-**B. 内存使用过高**
+##### 内存使用过高
+
 ```python
 # 减少缓存大小
 THREAD_CACHE_SIZE = 500
@@ -210,7 +229,8 @@ MAX_ITEMS = 2000
 CACHE_TTL = 180  # 3分钟
 ```
 
-**C. 网络延迟高**
+##### 网络延迟高
+
 ```bash
 # 检查网络连接
 ping discord.com
@@ -222,12 +242,14 @@ nslookup discord.com
 
 ### 5. 权限和认证问题
 
-#### 症状
+#### 权限异常症状
+
 - 403 Forbidden错误
 - 无法访问某些频道
 - 命令执行失败
 
-#### 诊断步骤
+#### 权限问题诊断
+
 ```bash
 # 1. 检查权限相关错误
 grep "Forbidden\|403" /opt/discord-bot/logs/discord_bot.log
@@ -239,38 +261,37 @@ grep "Forbidden\|403" /opt/discord-bot/logs/discord_bot.log
 # 检查机器人在目标频道的权限
 ```
 
-#### 解决方案
+#### 权限问题解决方案
 
-**A. 机器人权限不足**
-```
-必需权限:
-✓ View Channels (查看频道)
-✓ Send Messages (发送消息)
-✓ Embed Links (嵌入链接)
-✓ Read Message History (读取消息历史)
-✓ Use Slash Commands (使用斜杠命令)
+##### 机器人权限不足
 
-推荐权限:
-✓ Manage Messages (管理消息)
-✓ Add Reactions (添加反应)
-```
+- 必需权限:
+  - View Channels (查看频道)
+  - Send Messages (发送消息)
+  - Embed Links (嵌入链接)
+  - Read Message History (读取消息历史)
+  - Use Slash Commands (使用斜杠命令)
+- 推荐权限:
+  - Manage Messages (管理消息)
+  - Add Reactions (添加反应)
 
-**B. 频道权限覆盖**
-```
-检查频道设置 > 权限 > 机器人角色
-确保没有被拒绝关键权限
-```
+##### 频道权限覆盖
+
+- 检查频道设置 > 权限 > 机器人角色
+- 确保没有被拒绝关键权限
 
 ### 6. 数据库问题
 
-#### 症状
+#### 数据库异常症状
+
 - 数据库连接失败
 - 数据查询错误
 - 数据库文件损坏
 
 #### SQLite问题
 
-**诊断**
+##### SQLite问题诊断
+
 ```bash
 # 检查数据库文件
 ls -la /opt/discord-bot/data/searchdb.sqlite
@@ -282,7 +303,8 @@ sqlite3 /opt/discord-bot/data/searchdb.sqlite "PRAGMA integrity_check;"
 du -h /opt/discord-bot/data/searchdb.sqlite
 ```
 
-**解决方案**
+##### SQLite问题解决方案
+
 ```bash
 # 修复数据库
 sqlite3 /opt/discord-bot/data/searchdb.sqlite "VACUUM;"
@@ -297,12 +319,14 @@ sudo systemctl restart discord-bot
 
 ### 7. Docker相关问题
 
-#### 症状
+#### Docker异常症状
+
 - 容器启动失败
 - 容器频繁重启
 - 卷挂载问题
 
-#### 诊断步骤
+#### Docker问题诊断
+
 ```bash
 # 1. 检查容器状态
 docker ps -a | grep discord-bot
@@ -317,9 +341,10 @@ docker stats discord-bot
 docker inspect discord-bot | grep -A 10 "Mounts"
 ```
 
-#### 解决方案
+#### Docker问题解决方案
 
-**A. 容器启动失败**
+##### 容器启动失败
+
 ```bash
 # 检查Docker镜像
 docker images | grep discord-forum-search-assistant
@@ -331,7 +356,8 @@ docker build -t discord-forum-search-assistant .
 docker exec discord-bot env | grep DISCORD_TOKEN
 ```
 
-**B. 容器重启循环**
+##### 容器重启循环
+
 ```bash
 # 检查退出代码
 docker ps -a | grep discord-bot
@@ -348,6 +374,7 @@ docker inspect discord-bot | grep -A 5 "Memory"
 ### 关键日志模式
 
 #### 1. 错误模式
+
 ```bash
 # 搜索相关错误
 grep -E "(Search.*error|search.*failed)" /opt/discord-bot/logs/discord_bot.log
@@ -360,6 +387,7 @@ grep -E "(discord.*error|HTTP.*error)" /opt/discord-bot/logs/discord_bot.log
 ```
 
 #### 2. 性能模式
+
 ```bash
 # 慢查询
 grep -E "(slow|timeout|exceeded)" /opt/discord-bot/logs/discord_bot.log
@@ -374,6 +402,7 @@ grep -E "(semaphore|concurrent|limit)" /opt/discord-bot/logs/discord_bot.log
 ### 日志级别调整
 
 #### 临时调试
+
 ```python
 # 在 config/settings.py 中临时调整
 bot.log_level = "DEBUG"
@@ -383,6 +412,7 @@ sudo systemctl restart discord-bot
 ```
 
 #### 特定模块调试
+
 ```python
 # 在代码中临时添加
 import logging
@@ -392,6 +422,7 @@ logging.getLogger('discord_bot.search').setLevel(logging.DEBUG)
 ## 紧急恢复程序
 
 ### 1. 服务完全无响应
+
 ```bash
 # Step 1: 强制停止
 sudo systemctl kill discord-bot
@@ -413,6 +444,7 @@ sudo systemctl status discord-bot
 ```
 
 ### 2. 数据恢复
+
 ```bash
 # Step 1: 停止服务
 sudo systemctl stop discord-bot
@@ -431,6 +463,7 @@ sudo systemctl start discord-bot
 ```
 
 ### 3. 配置回滚
+
 ```bash
 # Step 1: 备份当前配置
 cp -r /opt/discord-bot/config /opt/discord-bot/config_backup_$(date +%Y%m%d_%H%M%S)
@@ -448,6 +481,7 @@ sudo systemctl restart discord-bot
 ## 预防措施
 
 ### 1. 监控设置
+
 ```bash
 # 设置基本监控
 */5 * * * * /opt/discord-bot/scripts/health_check.sh
@@ -457,6 +491,7 @@ sudo systemctl restart discord-bot
 ```
 
 ### 2. 自动备份
+
 ```bash
 # 每日备份
 0 2 * * * /opt/discord-bot/scripts/daily_backup.sh
@@ -466,6 +501,7 @@ sudo systemctl restart discord-bot
 ```
 
 ### 3. 日志轮转
+
 ```bash
 # 配置logrotate
 sudo nano /etc/logrotate.d/discord-bot

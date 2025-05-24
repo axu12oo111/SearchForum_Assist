@@ -58,6 +58,7 @@ LOG_LEVEL=INFO
 ```
 
 **特点:**
+
 - 仅使用内存缓存
 - 重启后缓存丢失
 - 配置简单，维护成本低
@@ -81,6 +82,7 @@ CONCURRENT_SEARCH_LIMIT=8
 ```
 
 **特点:**
+
 - 双层缓存（内存+Redis）
 - 缓存持久化
 - 更好的性能
@@ -116,6 +118,7 @@ LOG_LEVEL=WARNING
 ```
 
 **特点:**
+
 - 最大化缓存效率
 - 支持数据库索引
 - 高并发处理能力
@@ -173,7 +176,7 @@ redis-cli ping
 
 ### Windows 安装
 
-1. 下载Redis for Windows: https://github.com/microsoftarchive/redis/releases
+1. 下载Redis for Windows: [GitHub Releases](https://github.com/microsoftarchive/redis/releases)
 2. 解压并运行 `redis-server.exe`
 3. 在另一个命令行窗口运行 `redis-cli.exe ping`
 
@@ -243,7 +246,7 @@ redis-cli monitor
 
 使用机器人的 `/bot_stats` 命令查看缓存性能：
 
-```
+```text
 缓存统计:
 线程缓存大小: 1,234
 线程缓存命中率: 85.2%
@@ -260,6 +263,7 @@ Redis可用: 是
 **症状**: 日志显示 "Redis连接失败，将使用内存缓存"
 
 **解决方案**:
+
 ```bash
 # 检查Redis是否运行
 sudo systemctl status redis-server
@@ -276,6 +280,7 @@ redis-cli ping
 **症状**: `/bot_stats` 显示命中率 < 50%
 
 **解决方案**:
+
 - 增加 `CACHE_TTL` 值
 - 增加 `THREAD_CACHE_SIZE` 值
 - 检查Redis内存限制
@@ -285,6 +290,7 @@ redis-cli ping
 **症状**: Redis内存使用超过预期
 
 **解决方案**:
+
 ```bash
 # 检查内存使用
 redis-cli info memory
@@ -325,11 +331,12 @@ CONCURRENT_SEARCH_LIMIT=20
 1. **安装Redis**（参考上述安装指南）
 
 2. **更新配置**:
-```env
-# 在 .env 文件中添加
-USE_REDIS_CACHE=true
-REDIS_URL=redis://localhost:6379/0
-```
+
+   ```env
+   # 在 .env 文件中添加
+   USE_REDIS_CACHE=true
+   REDIS_URL=redis://localhost:6379/0
+   ```
 
 3. **重启机器人**
 
@@ -340,17 +347,19 @@ REDIS_URL=redis://localhost:6379/0
 ### 从Redis回退到内存缓存
 
 1. **更新配置**:
-```env
-# 在 .env 文件中修改
-USE_REDIS_CACHE=false
-```
+
+   ```env
+   # 在 .env 文件中修改
+   USE_REDIS_CACHE=false
+   ```
 
 2. **重启机器人**
 
 3. **可选：停止Redis服务**:
-```bash
-sudo systemctl stop redis-server
-```
+
+   ```bash
+   sudo systemctl stop redis-server
+   ```
 
 ## 成本效益分析
 

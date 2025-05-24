@@ -1,35 +1,36 @@
 # Discord Forum Search Assistant
 
-<div align="center">
-
 ![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
 ![Discord.py](https://img.shields.io/badge/Discord.py-2.3+-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Maintenance](https://img.shields.io/badge/Maintained-Yes-green.svg)
 
+**Language / 语言:** [🇺🇸 **English**](README.md) • [🇨🇳 中文](README_zh.md)
+
 **A powerful Discord bot designed for large servers, providing advanced forum post search and content management capabilities.**
 
 [Features](#-features) • [Quick Start](#-quick-start) • [Deployment](#-deployment) • [Documentation](#-documentation) • [Support](#-support)
-
-</div>
 
 ---
 
 ## 🚀 Features
 
 ### 🔍 **Advanced Search Engine**
+
 - **Complex Query Syntax**: Support for AND, OR, NOT operators and exact phrase matching
 - **Multi-dimensional Filtering**: Filter by tags, authors, date ranges, reactions, and reply counts
 - **Smart Sorting**: 8 sorting options including reactions, replies, post time, and last activity
 - **Real-time Progress**: Live search progress with cancellation support for long-running queries
 
 ### 🎯 **User Experience**
+
 - **Paginated Results**: Intuitive interface controls for browsing large result sets
 - **Auto-completion**: Smart suggestions with recently used options prioritized
 - **Search History**: Save and recall recent searches for quick access
 - **Interactive Controls**: Rich embed interfaces with reaction-based navigation
 
 ### ⚡ **Performance & Scalability**
+
 - **Enterprise-grade Caching**: Redis integration for high-traffic servers (10,000+ users)
 - **Intelligent Memory Management**: Optimized for large-scale Discord communities
 - **Performance Monitoring**: Built-in metrics and resource usage tracking

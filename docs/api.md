@@ -31,12 +31,14 @@ cache_manager.initialize(
 初始化缓存系统。
 
 **参数:**
+
 - `use_redis` (bool): 是否启用Redis缓存
 - `redis_url` (str): Redis连接URL
 - `cache_ttl` (int): 缓存生存时间（秒）
 - `thread_cache_size` (int): 线程缓存最大项数
 
 **示例:**
+
 ```python
 cache_manager.initialize(
     use_redis=True,
@@ -51,6 +53,7 @@ cache_manager.initialize(
 获取缓存统计信息。
 
 **返回值:**
+
 ```python
 {
     'thread_cache': {
@@ -70,16 +73,18 @@ cache_manager.initialize(
 
 专用于Discord线程数据的缓存管理器。
 
-#### 主要方法
+#### ThreadCache 主要方法
 
 ##### `get_thread_stats(thread_id)`
 
 获取线程统计信息。
 
 **参数:**
+
 - `thread_id` (str): Discord线程ID
 
 **返回值:**
+
 ```python
 {
     'reaction_count': 15,
@@ -88,6 +93,7 @@ cache_manager.initialize(
 ```
 
 **示例:**
+
 ```python
 stats = await cache_manager.thread_cache.get_thread_stats("123456789")
 if stats:
@@ -100,10 +106,12 @@ if stats:
 缓存线程统计信息。
 
 **参数:**
+
 - `thread_id` (str): Discord线程ID
 - `stats` (dict): 统计数据
 
 **示例:**
+
 ```python
 await cache_manager.thread_cache.set_thread_stats(
     "123456789",
@@ -120,6 +128,7 @@ await cache_manager.thread_cache.set_thread_stats(
 为Discord命令添加错误处理。
 
 **示例:**
+
 ```python
 from utils.error_handler import handle_command_errors
 
@@ -136,6 +145,7 @@ async def example_command(self, interaction: discord.Interaction):
 为后台任务添加错误处理。
 
 **示例:**
+
 ```python
 from utils.error_handler import handle_background_task_errors
 
@@ -214,13 +224,14 @@ if db_manager:
     await db_manager.initialize()
 ```
 
-#### 主要方法
+#### DatabaseManager 主要方法
 
 ##### `upsert_thread_stats(thread_id, guild_id, channel_id, reaction_count, reply_count)`
 
 插入或更新线程统计信息。
 
 **示例:**
+
 ```python
 await db_manager.upsert_thread_stats(
     thread_id=123456789,
@@ -231,13 +242,14 @@ await db_manager.upsert_thread_stats(
 )
 ```
 
-##### `get_thread_stats(thread_id)`
+##### `get_thread_stats_from_db(thread_id)`
 
 从数据库获取线程统计信息。
 
 **示例:**
+
 ```python
-stats = await db_manager.get_thread_stats(123456789)
+stats = await db_manager.get_thread_stats(123456789) # Renamed to avoid conflict with CacheManager method
 if stats:
     print(f"反应数: {stats['reaction_count']}")
     print(f"更新时间: {stats['updated_at']}")
@@ -248,6 +260,7 @@ if stats:
 记录搜索历史。
 
 **示例:**
+
 ```python
 await db_manager.record_search_history(
     user_id=123456789,

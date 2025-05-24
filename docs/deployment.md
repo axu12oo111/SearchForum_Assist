@@ -3,6 +3,7 @@
 ## 系统要求
 
 ### 最低要求
+
 - **操作系统**: Linux (Ubuntu 20.04+), macOS 10.15+, Windows 10+
 - **Python**: 3.11 或更高版本
 - **内存**: 512MB RAM (小型服务器)
@@ -10,6 +11,7 @@
 - **网络**: 稳定的互联网连接
 
 ### 推荐配置
+
 - **操作系统**: Ubuntu 22.04 LTS
 - **Python**: 3.11+
 - **内存**: 2GB+ RAM (大型服务器)
@@ -22,6 +24,7 @@
 ### Redis (可选但推荐)
 
 #### Ubuntu/Debian 安装
+
 ```bash
 # 更新包列表
 sudo apt update
@@ -39,6 +42,7 @@ redis-cli ping
 ```
 
 #### Docker 安装
+
 ```bash
 # 拉取Redis镜像
 docker pull redis:7-alpine
@@ -55,6 +59,7 @@ docker exec discord-bot-redis redis-cli ping
 ```
 
 #### Redis 配置优化
+
 ```bash
 # 编辑Redis配置文件
 sudo nano /etc/redis/redis.conf
@@ -69,7 +74,8 @@ save 60 10000
 
 ### PostgreSQL (可选)
 
-#### Ubuntu/Debian 安装
+#### PostgreSQL 安装配置
+
 ```bash
 # 安装PostgreSQL
 sudo apt install postgresql postgresql-contrib
@@ -85,6 +91,7 @@ GRANT ALL PRIVILEGES ON DATABASE discord_bot TO bot_user;
 ## 应用部署
 
 ### 1. 获取源代码
+
 ```bash
 # 克隆仓库
 git clone https://github.com/your-username/discord-forum-search-assistant.git
@@ -97,6 +104,7 @@ cd discord-forum-search-assistant-main
 ```
 
 ### 2. 环境准备
+
 ```bash
 # 创建Python虚拟环境
 python3.11 -m venv venv
@@ -113,6 +121,7 @@ pip install -r requirements.txt
 ### 3. 配置设置
 
 #### 环境变量配置
+
 ```bash
 # 复制环境变量模板
 cp .env.example .env
@@ -122,6 +131,7 @@ nano .env
 ```
 
 #### .env 文件示例
+
 ```env
 # Discord Bot Token (必需)
 DISCORD_TOKEN=your_discord_bot_token_here
@@ -150,6 +160,7 @@ DB_PATH=data/searchdb.sqlite
 ```
 
 #### 环境配置选择
+
 ```bash
 # 对于小型服务器，使用默认配置
 export BOT_ENVIRONMENT=default
@@ -164,6 +175,7 @@ export BOT_ENVIRONMENT=production
 ### 4. Discord Bot 设置
 
 #### 创建Discord应用
+
 1. 访问 [Discord Developer Portal](https://discord.com/developers/applications)
 2. 点击 "New Application"
 3. 输入应用名称并创建
@@ -171,7 +183,9 @@ export BOT_ENVIRONMENT=production
 5. 复制 Bot Token 到 `.env` 文件
 
 #### 设置机器人权限
+
 必需权限:
+
 - `Send Messages` (发送消息)
 - `Use Slash Commands` (使用斜杠命令)
 - `Embed Links` (嵌入链接)
@@ -179,10 +193,12 @@ export BOT_ENVIRONMENT=production
 - `View Channels` (查看频道)
 
 推荐权限:
+
 - `Manage Messages` (管理消息)
 - `Add Reactions` (添加反应)
 
 #### 邀请机器人到服务器
+
 1. 在Developer Portal的 "OAuth2" > "URL Generator" 页面
 2. 选择 "bot" 和 "applications.commands" 作用域
 3. 选择上述权限
@@ -192,6 +208,7 @@ export BOT_ENVIRONMENT=production
 ### 5. 启动应用
 
 #### 开发环境启动
+
 ```bash
 # 激活虚拟环境
 source venv/bin/activate
@@ -203,6 +220,7 @@ python main.py
 #### 生产环境启动
 
 ##### 使用systemd (推荐)
+
 ```bash
 # 创建systemd服务文件
 sudo nano /etc/systemd/system/discord-bot.service
@@ -248,6 +266,7 @@ sudo journalctl -u discord-bot -f
 ```
 
 ##### 使用Docker
+
 ```bash
 # 构建镜像
 docker build -t discord-forum-search-assistant .
@@ -266,6 +285,7 @@ docker logs -f discord-bot
 ```
 
 ##### 使用Docker Compose
+
 ```yaml
 # docker-compose.yml
 version: '3.8'
@@ -314,6 +334,7 @@ docker-compose logs -f discord-bot
 ## 验证部署
 
 ### 1. 健康检查
+
 ```bash
 # 检查机器人是否在线
 # 在Discord服务器中使用 /bot_stats 命令
@@ -326,6 +347,7 @@ tail -f logs/discord_bot.log
 ```
 
 ### 2. 功能测试
+
 ```bash
 # 测试搜索功能
 # 在Discord中使用 /forum_search 命令
@@ -338,6 +360,7 @@ tail -f logs/discord_bot.log
 ```
 
 ### 3. 性能监控
+
 ```bash
 # 查看系统资源使用
 htop
@@ -356,6 +379,7 @@ redis-cli info memory
 ### 常见问题
 
 #### 1. 机器人无法启动
+
 ```bash
 # 检查Python版本
 python --version
@@ -371,6 +395,7 @@ python main.py
 ```
 
 #### 2. Redis连接失败
+
 ```bash
 # 检查Redis服务状态
 sudo systemctl status redis-server
@@ -383,11 +408,13 @@ sudo nano /etc/redis/redis.conf
 ```
 
 #### 3. 权限错误
+
 - 确保机器人有必要的Discord权限
 - 检查文件系统权限
 - 验证用户权限设置
 
 #### 4. 内存不足
+
 ```bash
 # 检查内存使用
 free -h
@@ -397,6 +424,7 @@ free -h
 ```
 
 ### 日志分析
+
 ```bash
 # 查看错误日志
 grep ERROR logs/discord_bot.log
@@ -411,6 +439,7 @@ tail -f logs/discord_bot.log | grep -E "(ERROR|WARNING)"
 ## 更新和维护
 
 ### 应用更新
+
 ```bash
 # 停止服务
 sudo systemctl stop discord-bot
@@ -429,6 +458,7 @@ sudo systemctl start discord-bot
 ```
 
 ### 数据备份
+
 ```bash
 # 创建备份脚本
 #!/bin/bash
@@ -448,6 +478,7 @@ rm -rf $BACKUP_DIR
 ```
 
 ### 监控设置
+
 ```bash
 # 设置日志轮转
 sudo nano /etc/logrotate.d/discord-bot

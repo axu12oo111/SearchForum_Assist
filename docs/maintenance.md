@@ -5,6 +5,7 @@
 ### 系统监控
 
 #### 1. 服务状态检查
+
 ```bash
 # 检查机器人服务状态
 sudo systemctl status discord-bot
@@ -17,6 +18,7 @@ docker ps | grep discord-bot
 ```
 
 #### 2. 资源使用监控
+
 ```bash
 # 检查系统资源使用
 htop
@@ -32,6 +34,7 @@ du -sh /opt/discord-bot/logs/
 ```
 
 #### 3. 网络连接检查
+
 ```bash
 # 检查Discord API连接
 curl -I https://discord.com/api/v10/gateway
@@ -46,6 +49,7 @@ netstat -tlnp | grep python
 ### 日志管理
 
 #### 1. 日志查看
+
 ```bash
 # 查看实时日志
 tail -f /opt/discord-bot/logs/discord_bot.log
@@ -61,6 +65,7 @@ grep "2024-01-01" /opt/discord-bot/logs/discord_bot.log
 ```
 
 #### 2. 日志分析
+
 ```bash
 # 统计错误数量
 grep -c ERROR /opt/discord-bot/logs/discord_bot.log
@@ -73,6 +78,7 @@ grep "Search command" /opt/discord-bot/logs/discord_bot.log | tail -10
 ```
 
 #### 3. 日志清理
+
 ```bash
 # 手动清理旧日志 (保留最近30天)
 find /opt/discord-bot/logs/ -name "*.log" -mtime +30 -delete
@@ -84,6 +90,7 @@ find /opt/discord-bot/logs/ -name "*.log" -mtime +7 -exec gzip {} \;
 ### 性能优化
 
 #### 1. 缓存管理
+
 ```bash
 # 查看Redis内存使用 (如果使用Redis)
 redis-cli info memory
@@ -96,6 +103,7 @@ redis-cli FLUSHDB
 ```
 
 #### 2. 内存优化
+
 ```bash
 # 检查内存泄漏
 ps -o pid,vsz,rss,comm -p $(pgrep -f "python main.py")
@@ -105,6 +113,7 @@ sudo systemctl restart discord-bot
 ```
 
 #### 3. 数据库维护 (如果使用数据库)
+
 ```bash
 # SQLite数据库优化
 sqlite3 /opt/discord-bot/data/searchdb.sqlite "VACUUM;"
@@ -118,6 +127,7 @@ ls -lh /opt/discord-bot/data/searchdb.sqlite
 ### 每日任务
 
 #### 1. 健康检查脚本
+
 ```bash
 #!/bin/bash
 # /opt/discord-bot/scripts/daily_health_check.sh
@@ -164,6 +174,7 @@ echo "[$DATE] Daily health check completed" >> $LOG_FILE
 ```
 
 #### 2. 设置定时任务
+
 ```bash
 # 编辑crontab
 crontab -e
@@ -178,6 +189,7 @@ crontab -e
 ### 每周任务
 
 #### 1. 性能报告生成
+
 ```bash
 #!/bin/bash
 # /opt/discord-bot/scripts/weekly_report.sh
@@ -213,6 +225,7 @@ fi
 ### 每月任务
 
 #### 1. 数据备份
+
 ```bash
 #!/bin/bash
 # /opt/discord-bot/scripts/monthly_backup.sh
@@ -243,6 +256,7 @@ find /backup/discord-bot/monthly/ -type d -mtime +180 -exec rm -rf {} \;
 ```
 
 #### 2. 系统更新检查
+
 ```bash
 # 检查系统更新
 sudo apt update && sudo apt list --upgradable
@@ -259,6 +273,7 @@ docker images --format "table {{.Repository}}\t{{.Tag}}\t{{.CreatedAt}}"
 ### 常见故障及解决方案
 
 #### 1. 机器人离线
+
 ```bash
 # 检查服务状态
 sudo systemctl status discord-bot
@@ -275,6 +290,7 @@ curl -I https://discord.com/api/v10/gateway
 ```
 
 #### 2. 内存使用过高
+
 ```bash
 # 检查内存使用详情
 ps aux --sort=-%mem | head -10
@@ -292,6 +308,7 @@ export CACHE_MAX_ITEMS=5000
 ```
 
 #### 3. Redis连接问题
+
 ```bash
 # 检查Redis服务
 sudo systemctl status redis-server
@@ -309,6 +326,7 @@ sudo systemctl restart redis-server
 ```
 
 #### 4. 搜索性能下降
+
 ```bash
 # 检查并发搜索数量
 grep "Search command" /opt/discord-bot/logs/discord_bot.log | tail -20
