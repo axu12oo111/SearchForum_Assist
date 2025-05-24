@@ -1,378 +1,336 @@
-# Discord论坛搜索机器人
+# Discord Forum Search Assistant
 
-一个功能强大的Discord机器人，专为大型服务器设计，提供高级论坛帖子搜索和内容管理功能。通过高效的缓存系统和优化的搜索算法，即使在拥有大量用户和帖子的服务器中也能保持出色性能。
+<div align="center">
 
-## 功能特点
+![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
+![Discord.py](https://img.shields.io/badge/Discord.py-2.3+-blue.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Maintenance](https://img.shields.io/badge/Maintained-Yes-green.svg)
 
-- **高级搜索语法**：支持AND、OR、NOT等复杂逻辑操作符和精确短语匹配
-- **多维度过滤**：按标签、作者、日期范围、反应数和回复数等多条件筛选
-- **智能排序**：支持8种排序方式，包括反应数、回复数、发帖时间和最后活跃时间
-- **实时搜索进度**：搜索过程中显示实时进度和统计信息，支持取消长时间运行的搜索
-- **分页浏览结果**：直观的界面控制，轻松浏览大量搜索结果
-- **自动完成建议**：输入时提供智能建议，优先显示最近使用的选项
-- **搜索历史记录**：保存用户最近的搜索记录，方便重复查询
-- **性能监控系统**：内置详细的性能统计和资源使用监控
-- **大型服务器优化**：专为高流量大型服务器(10000+用户)设计，支持Redis缓存
+**A powerful Discord bot designed for large servers, providing advanced forum post search and content management capabilities.**
 
-## 安装说明
+[Features](#-features) • [Quick Start](#-quick-start) • [Deployment](#-deployment) • [Documentation](#-documentation) • [Support](#-support)
 
-### 环境要求
+</div>
 
-- Python 3.11.x
-- Discord.py v2.3+
-- 可选：Redis服务器（用于高级缓存）
-- 机器人需要的权限：
-  - 读取消息
-  - 发送消息
-  - 嵌入链接
-  - 添加反应
-  - 读取消息历史
-  - 查看频道
+---
 
-### 安装步骤
+## 🚀 Features
 
-1. 克隆项目仓库：
+### 🔍 **Advanced Search Engine**
+- **Complex Query Syntax**: Support for AND, OR, NOT operators and exact phrase matching
+- **Multi-dimensional Filtering**: Filter by tags, authors, date ranges, reactions, and reply counts
+- **Smart Sorting**: 8 sorting options including reactions, replies, post time, and last activity
+- **Real-time Progress**: Live search progress with cancellation support for long-running queries
 
-    ```bash
-    git clone https://github.com/yourusername/discord-forum-search-bot.git
-    cd discord-forum-search-bot
-    ```
+### 🎯 **User Experience**
+- **Paginated Results**: Intuitive interface controls for browsing large result sets
+- **Auto-completion**: Smart suggestions with recently used options prioritized
+- **Search History**: Save and recall recent searches for quick access
+- **Interactive Controls**: Rich embed interfaces with reaction-based navigation
 
-2. 安装依赖项：
+### ⚡ **Performance & Scalability**
+- **Enterprise-grade Caching**: Redis integration for high-traffic servers (10,000+ users)
+- **Intelligent Memory Management**: Optimized for large-scale Discord communities
+- **Performance Monitoring**: Built-in metrics and resource usage tracking
+- **Multi-environment Support**: Configurations for development, testing, and production
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+## 🚀 Quick Start
 
-3. 创建并配置环境变量文件(`.env`)：
+### Prerequisites
 
-    ```env
-    DISCORD_TOKEN=your_bot_token_here
-    ```
+- **Python**: 3.11+ (Required)
+- **Discord.py**: v2.3+ (Auto-installed)
+- **Redis**: Optional but recommended for production
+- **Bot Permissions**:
+  - Send Messages
+  - Use Slash Commands
+  - Embed Links
+  - Add Reactions
+  - Read Message History
+  - View Channels
 
-4. 运行机器人：
+### Installation
 
-    ```bash
-    python main.py
-    ```
+1. **Clone the repository**
 
-### Docker部署（推荐用于生产环境）
+   ```bash
+   git clone https://github.com/yourusername/discord-forum-search-assistant.git
+   cd discord-forum-search-assistant
+   ```
 
-使用Docker Compose快速部署（包含Redis缓存）：
+2. **Install dependencies**
+
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Configure environment**
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your Discord bot token
+   ```
+
+4. **Run the bot**
+
+   ```bash
+   python main.py
+   ```
+
+### 🐳 Docker Deployment (Recommended)
+
+Quick deployment with Docker Compose (includes Redis):
 
 ```bash
-# 配置环境变量
+# Configure environment
 echo "DISCORD_TOKEN=your_bot_token_here" > .env
 
-# 启动服务
+# Start services
 docker-compose up -d
 ```
 
-## 使用指南
+## 📖 Usage Guide
 
-### 搜索命令
-
-基本搜索：
+### Basic Search
 
 ```bash
-/forum_search forum_name:[论坛名称] search_word:[搜索关键词]
+/forum_search forum_name:[forum-name] search_word:[keywords]
 ```
 
-高级搜索语法：
+### Advanced Search Syntax
 
-- AND搜索: `term1 AND term2` 或 `term1 & term2`
-- OR搜索: `term1 OR term2` 或 `term1 | term2`
-- NOT搜索: `NOT term` 或 `-term`
-- 精确短语: `"exact phrase"`
-- 组合使用: `(term1 OR term2) AND NOT term3`
+| Operator | Syntax | Example |
+|----------|--------|---------|
+| **AND** | `term1 AND term2` or `term1 & term2` | `python AND discord` |
+| **OR** | `term1 OR term2` or `term1 \| term2` | `bot OR automation` |
+| **NOT** | `NOT term` or `-term` | `NOT deprecated` |
+| **Exact Phrase** | `"exact phrase"` | `"error handling"` |
+| **Complex** | `(term1 OR term2) AND NOT term3` | `(python OR js) AND NOT beginner` |
 
-多条件过滤：
+### Multi-dimensional Filtering
 
 ```bash
-/forum_search forum_name:[论坛名称] tag1:[标签1] tag2:[标签2] original_poster:[用户] min_reactions:[数量] start_date:[日期]
+/forum_search forum_name:[forum] tag1:[tag1] tag2:[tag2]
+              original_poster:[user] min_reactions:[count]
+              start_date:[date] order:[sort-method]
 ```
 
-排序选项：
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `/forum_search` | Main search command with advanced filtering |
+| `/search_syntax` | Display search syntax help |
+| `/search_history` | View your recent searches |
+| `/bot_stats` | Bot performance and system statistics |
+| `/server_stats` | Current server statistics |
+
+### Navigation Controls
+
+| Button | Action |
+|--------|--------|
+| ⏮️ | First page |
+| ◀️ | Previous page |
+| ▶️ | Next page |
+| ⏭️ | Last page |
+| 🔢 | Jump to specific page |
+| 🔄 | Refresh results |
+| ❌ | Close search results |
+
+### Sorting Options
+
+- **Reactions**: Highest/Lowest reaction count
+- **Replies**: Most/Least replies
+- **Date**: Newest/Oldest posts
+- **Activity**: Most/Least recently active
+
+## 🚀 Deployment
+
+### System Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| **OS** | Ubuntu 20.04+, macOS 10.15+, Windows 10+ | Ubuntu 22.04 LTS |
+| **Python** | 3.11+ | 3.11+ |
+| **Memory** | 512MB RAM | 2GB+ RAM |
+| **Storage** | 1GB | 5GB+ SSD |
+| **CPU** | 1 core | 2+ cores |
+
+### Environment Configuration
+
+The bot supports multiple deployment environments through a unified configuration system:
 
 ```bash
-/forum_search forum_name:[论坛名称] order:[排序方式]
+# Set environment (default, large_server, development, production)
+export BOT_ENVIRONMENT=production
+
+# Or use the configuration manager
+python scripts/config_manager.py set production
 ```
 
-支持的排序方式：最高反应降序/升序、总回复数降序/升序、发帖时间由新到旧/由旧到新、最后活跃由新到旧/由旧到新
+### Cloud Deployment Options
 
-### 其他实用命令
+| Platform | Cost/Month | Best For | Setup Difficulty |
+|----------|------------|----------|------------------|
+| **Railway** ⭐⭐⭐⭐⭐ | $5-8 | Production | Easy |
+| **Render** ⭐⭐⭐⭐ | $0-7 | Testing/Small prod | Easy |
+| **DigitalOcean** ⭐⭐⭐⭐ | $5-17 | Enterprise | Medium |
 
-查看搜索语法帮助：
+#### Railway Deployment (Recommended)
 
 ```bash
-/search_syntax
+# Install Railway CLI
+npm install -g @railway/cli
+
+# Deploy
+railway login
+railway init
+railway variables set DISCORD_TOKEN=your_token_here
+railway up
 ```
 
-查看搜索历史：
+#### Render Deployment
+
+```yaml
+# render.yaml
+services:
+  - type: web
+    name: discord-forum-search-bot
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: DISCORD_TOKEN
+        sync: false
+```
+
+### Local Development Setup
+
+1. **Clone and setup**
+
+   ```bash
+   git clone https://github.com/yourusername/discord-forum-search-assistant.git
+   cd discord-forum-search-assistant
+   python -m venv venv
+   source venv/bin/activate  # Linux/macOS
+   pip install -r requirements.txt
+   ```
+
+2. **Configure environment**
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your settings
+   ```
+
+3. **Set up Discord Bot**
+   - Visit [Discord Developer Portal](https://discord.com/developers/applications)
+   - Create application and generate Bot Token
+   - Enable required permissions:
+     - Send Messages
+     - Use Slash Commands
+     - Embed Links
+     - Read Message History
+     - View Channels
+
+4. **Run the bot**
+
+   ```bash
+   python main.py
+   ```
+
+### Performance Optimization
+
+For large servers (10,000+ users), use the `large_server` environment:
 
 ```bash
-/search_history
+# Set large server configuration
+python scripts/config_manager.py set large_server
+
+# Or set environment variable
+export BOT_ENVIRONMENT=large_server
 ```
 
-查看机器人性能统计：
+**Large Server Optimizations:**
+
+- **Redis Caching**: Enabled by default
+- **Database Indexing**: Automatic for faster searches
+- **Incremental Loading**: Reduces memory usage
+- **Extended Timeouts**: Better for high-traffic servers
+
+## 📊 Monitoring & Performance
+
+### Built-in Monitoring
 
 ```bash
-/bot_stats
+/bot_stats    # System performance and statistics
+/server_stats # Current server metrics
 ```
 
-查看服务器统计信息：
+**Monitoring Features:**
+
+- **System Resources**: CPU, memory, thread usage
+- **Search Analytics**: Success rates, response times, concurrent searches
+- **Cache Efficiency**: Hit rates, cache size, Redis status
+- **Command Usage**: Most used commands and active servers
+- **Network Status**: Connection health and latency
+
+### Health Checks
 
 ```bash
-/server_stats
+# Check bot status
+python scripts/config_manager.py validate
+
+# View current configuration
+python scripts/config_manager.py current
+
+# Compare environments
+python scripts/config_manager.py compare default large_server
 ```
 
-### 分页控制
+## 📚 Documentation
 
-- ⏮️: 第一页
-- ◀️: 上一页
-- ▶️: 下一页
-- ⏭️: 最后一页
-- 🔢: 跳转到指定页面
-- 🔄: 刷新结果
-- ❌: 关闭搜索结果
+| Document | Description |
+|----------|-------------|
+| [Architecture](docs/architecture.md) | System design and components |
+| [Deployment Guide](docs/deployment.md) | Detailed deployment instructions |
+| [Cloud Comparison](docs/cloud_deployment_comparison.md) | Platform comparison and costs |
+| [Maintenance](docs/maintenance.md) | Operations and maintenance guide |
+| [Troubleshooting](docs/troubleshooting.md) | Common issues and solutions |
+| [Performance](docs/performance_optimization.md) | Optimization strategies |
 
-## 部署和维护指南
+## 🐛 Troubleshooting
 
-### 系统要求
+| Issue | Solution |
+|-------|----------|
+| **Bot not responding** | Check `DISCORD_TOKEN` and network connectivity |
+| **Empty search results** | Verify bot permissions in target channels |
+| **Slow performance** | Enable Redis cache, adjust pagination settings |
+| **Command errors** | Check logs: `tail -f logs/discord_bot.log` |
+| **Memory issues** | Use `large_server` environment configuration |
 
-#### 最低要求
-- **操作系统**: Linux (Ubuntu 20.04+), macOS 10.15+, Windows 10+
-- **Python**: 3.11 或更高版本
-- **内存**: 512MB RAM (小型服务器)
-- **存储**: 1GB 可用空间
+## 🤝 Support
 
-#### 推荐配置
-- **操作系统**: Ubuntu 22.04 LTS
-- **Python**: 3.11+
-- **内存**: 2GB+ RAM (大型服务器)
-- **存储**: 5GB+ SSD
-- **CPU**: 2+ 核心
+- **Issues**: [GitHub Issues](https://github.com/yourusername/discord-forum-search-assistant/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/yourusername/discord-forum-search-assistant/discussions)
+- **Documentation**: [Wiki](https://github.com/yourusername/discord-forum-search-assistant/wiki)
 
-### 依赖服务配置
+## 📄 License
 
-#### Redis服务器 (推荐)
-```bash
-# Ubuntu/Debian 安装
-sudo apt update
-sudo apt install redis-server
-sudo systemctl start redis-server
-sudo systemctl enable redis-server
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-# 验证安装
-redis-cli ping  # 应返回 PONG
-```
+## 🚀 Contributing
 
-#### Docker方式安装Redis
-```bash
-docker run -d \
-  --name discord-bot-redis \
-  -p 6379:6379 \
-  -v redis-data:/data \
-  redis:7-alpine redis-server --appendonly yes
-```
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on:
 
-### 应用部署
+- Code style and standards
+- Pull request process
+- Issue reporting
+- Development setup
 
-#### 1. 获取源代码
-```bash
-git clone https://github.com/your-username/discord-forum-search-assistant.git
-cd discord-forum-search-assistant
-```
+---
 
-#### 2. 环境准备
-```bash
-# 创建虚拟环境
-python3.11 -m venv venv
-source venv/bin/activate  # Linux/macOS
+Made with ❤️ for the Discord community
 
-# 安装依赖
-pip install -r requirements.txt
-```
-
-#### 3. 配置设置
-```bash
-# 复制环境变量模板
-cp .env.example .env
-
-# 编辑配置文件
-nano .env
-```
-
-#### 必需的环境变量
-```env
-# Discord Bot Token (必需)
-DISCORD_TOKEN=your_discord_bot_token_here
-
-# Redis配置 (可选但推荐)
-USE_REDIS_CACHE=true
-REDIS_URL=redis://localhost:6379/0
-
-# 缓存设置
-CACHE_TTL=600
-THREAD_CACHE_SIZE=1000
-
-# 搜索限制
-MAX_MESSAGES_PER_SEARCH=1000
-CONCURRENT_SEARCH_LIMIT=5
-```
-
-#### 4. Discord Bot设置
-1. 访问 [Discord Developer Portal](https://discord.com/developers/applications)
-2. 创建新应用并生成Bot Token
-3. 设置必需权限：
-   - Send Messages (发送消息)
-   - Use Slash Commands (使用斜杠命令)
-   - Embed Links (嵌入链接)
-   - Read Message History (读取消息历史)
-   - View Channels (查看频道)
-
-#### 5. 启动应用
-
-**开发环境**
-```bash
-python main.py
-```
-
-**生产环境 (systemd)**
-```bash
-# 创建服务文件
-sudo nano /etc/systemd/system/discord-bot.service
-
-# 启用服务
-sudo systemctl enable discord-bot
-sudo systemctl start discord-bot
-```
-
-**Docker部署**
-```bash
-# 构建镜像
-docker build -t discord-forum-search-assistant .
-
-# 运行容器
-docker run -d \
-  --name discord-bot \
-  --restart unless-stopped \
-  -v $(pwd)/data:/app/data \
-  --env-file .env \
-  discord-forum-search-assistant
-```
-
-**Docker Compose部署**
-```bash
-# 使用提供的 docker-compose.yml
-docker-compose up -d
-
-# 查看日志
-docker-compose logs -f discord-bot
-```
-
-### 大型服务器优化建议
-
-对于拥有10000+用户和大量帖子的服务器，建议以下配置：
-
-1. 在`config/config.py`中调整以下参数：
-   - 降低 `MAX_MESSAGES_PER_SEARCH` 至合理值(如500-1000)
-   - 增加 `CACHE_TTL` 至5-10分钟
-   - 增加 `REACTION_TIMEOUT` 以延长会话有效期
-
-2. 启用高级缓存设置：
-   - 设置 `USE_REDIS_CACHE=True` (需要额外安装Redis)
-   - 配置 `THREAD_CACHE_SIZE` 以适应服务器规模
-
-3. 在服务器管理员设置中：
-   - 限制使用机器人的频道
-   - 设置合理的命令冷却时间
-   - 定期监控资源使用情况
-
-## 性能监控
-
-启用内置的性能监控：
-```
-/bot_stats
-```
-查看机器人运行状态、响应时间和资源使用情况。
-
-### 监控和维护
-
-#### 健康检查
-```bash
-# 检查服务状态
-sudo systemctl status discord-bot
-
-# 查看缓存统计
-# 在Discord中使用: /bot_stats
-
-# 检查Redis状态
-redis-cli info memory
-```
-
-#### 日志管理
-```bash
-# 查看实时日志
-tail -f logs/discord_bot.log
-
-# 查看错误日志
-grep ERROR logs/discord_bot.log | tail -20
-```
-
-#### 备份策略
-```bash
-# 每日数据备份
-tar -czf backup/data_$(date +%Y%m%d).tar.gz data/
-
-# Redis数据备份
-redis-cli BGSAVE
-cp /var/lib/redis/dump.rdb backup/redis_$(date +%Y%m%d).rdb
-```
-
-### 详细文档
-
-- [系统架构说明](docs/architecture.md)
-- [详细部署指南](docs/deployment.md)
-- [运维手册](docs/maintenance.md)
-- [故障排除指南](docs/troubleshooting.md)
-
-## 性能监控
-
-机器人内置了详细的性能监控系统：
-
-```bash
-/bot_stats
-```
-
-监控内容包括：
-
-- 系统资源使用情况（CPU、内存、线程数）
-- 搜索统计（总次数、成功率、平均时间、峰值并发）
-- 缓存效率（命中率、缓存大小）
-- 最常用命令统计
-- 最活跃服务器数据
-- 网络和连接状态
-
-还可以查看当前服务器的详细统计信息：
-
-```bash
-/server_stats
-```
-
-## 故障排除
-
-常见问题：
-
-- **机器人无响应**：检查TOKEN配置和网络连接
-- **搜索结果为空**：确认机器人有适当的频道访问权限
-- **加载缓慢**：考虑调整缓存和分页设置
-- **命令错误**：查看日志获取详细错误信息
-
-## 许可证
-
-MIT License
-
-## 贡献指南
-
-欢迎贡献代码、报告问题或提出改进建议。请提交Pull Request或开Issue讨论。
+[⭐ Star this repo](https://github.com/yourusername/discord-forum-search-assistant) • [🐛 Report Bug](https://github.com/yourusername/discord-forum-search-assistant/issues) • [💡 Request Feature](https://github.com/yourusername/discord-forum-search-assistant/issues)
