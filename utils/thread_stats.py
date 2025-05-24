@@ -7,67 +7,28 @@ import time
 
 logger = logging.getLogger('discord_bot.thread_stats')
 
-class ThreadStatsCache:
-    def __init__(self, ttl: int = 300, cleanup_interval: int = 3600):  # 5分钟缓存，1小时清理
-        self.cache: Dict[int, Dict] = {}
-        self.ttl = ttl
-        self.last_updated: Dict[int, datetime] = {}
-        self.last_cleanup = time.time()
-        self.cleanup_interval = cleanup_interval
+# 导入统一缓存管理器
+from .cache_manager import cache_manager
 
-    def get(self, thread_id: int) -> Optional[Dict]:
-        current_time = datetime.now()
-        
-        # 检查是否需要清理缓存
-        if time.time() - self.last_cleanup > self.cleanup_interval:
-            self._cleanup_cache()
-        
-        if thread_id in self.cache:
-            if current_time - self.last_updated[thread_id] < timedelta(seconds=self.ttl):
-                return self.cache[thread_id]
-            else:
-                self._remove_entry(thread_id)
-        return None
-
-    def set(self, thread_id: int, stats: Dict):
-        self.cache[thread_id] = stats
-        self.last_updated[thread_id] = datetime.now()
-
-    def _remove_entry(self, thread_id: int):
-        """安全地移除缓存条目"""
-        self.cache.pop(thread_id, None)
-        self.last_updated.pop(thread_id, None)
-
-    def _cleanup_cache(self):
-        """清理过期的缓存条目"""
-        current_time = datetime.now()
-        expired_ids = [
-            thread_id for thread_id, updated_time in self.last_updated.items()
-            if current_time - updated_time >= timedelta(seconds=self.ttl)
-        ]
-        
-        for thread_id in expired_ids:
-            self._remove_entry(thread_id)
-            
-        self.last_cleanup = time.time()
-        logger.debug(f"缓存清理完成，移除了 {len(expired_ids)} 个过期条目")
-
-# 创建全局缓存实例
-_stats_cache = ThreadStatsCache()
-
-async def get_thread_stats(thread: Thread) -> dict:
+async def get_thread_stats(thread: Thread) -> Dict[str, int]:
     """
     获取线程的统计数据，包括 reaction_count 和 reply_count。
-    使用缓存减少API调用，并优化数据获取方式。
+    使用统一缓存管理器减少API调用，并优化数据获取方式。
+
+    Args:
+        thread: Discord线程对象
+
+    Returns:
+        包含reaction_count和reply_count的字典
     """
     try:
-        # 检查缓存
-        cached_stats = _stats_cache.get(thread.id)
+        # 检查统一缓存
+        cached_stats = await cache_manager.thread_cache.get_thread_stats(str(thread.id))
         if cached_stats:
             return cached_stats
 
         stats = {'reaction_count': 0, 'reply_count': 0}
-        
+
         # 使用 fetch_message 直接获取第一条消息
         try:
             first_message = await thread.fetch_message(thread.id)
@@ -98,8 +59,8 @@ async def get_thread_stats(thread: Thread) -> dict:
             logger.error(f"计算线程 {thread.id} 的回复数时出错: {e}", exc_info=True)
             stats['reply_count'] = 0
 
-        # 保存到缓存
-        _stats_cache.set(thread.id, stats)
+        # 保存到统一缓存
+        await cache_manager.thread_cache.set_thread_stats(str(thread.id), stats)
         return stats
 
     except Exception as e:

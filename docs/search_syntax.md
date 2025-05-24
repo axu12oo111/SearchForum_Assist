@@ -6,13 +6,13 @@
 
 使用slash命令 `/forum_search` 启动搜索功能：
 
-```
+```bash
 /forum_search forum_name:[论坛名称] query:[关键词]
 ```
 
 例如，要在"问题解答"论坛中搜索"Python错误"：
 
-```
+```bash
 /forum_search forum_name:问题解答 query:Python错误
 ```
 
@@ -38,7 +38,7 @@
 
 使用引号可以搜索完全匹配的短语：
 
-```
+```text
 "完整短语匹配"
 ```
 
@@ -48,11 +48,12 @@
 
 您可以组合使用上述操作符创建复杂的搜索条件：
 
-```
+```text
 Python AND (错误 OR 异常) NOT "初学者问题"
 ```
 
 这个搜索会查找：
+
 - 包含"Python"的内容，并且
 - 包含"错误"或"异常"的内容，但
 - 不包含短语"初学者问题"的内容
@@ -65,7 +66,7 @@ Python AND (错误 OR 异常) NOT "初学者问题"
 
 最多可以指定3个要包含的标签：
 
-```
+```bash
 /forum_search forum_name:[论坛名称] tag1:[标签1] tag2:[标签2] tag3:[标签3]
 ```
 
@@ -73,7 +74,7 @@ Python AND (错误 OR 异常) NOT "初学者问题"
 
 同样可以指定要排除的标签：
 
-```
+```bash
 /forum_search forum_name:[论坛名称] exclude_tag1:[排除标签1] exclude_tag2:[排除标签2]
 ```
 
@@ -81,13 +82,13 @@ Python AND (错误 OR 异常) NOT "初学者问题"
 
 通过指定作者来限制搜索范围：
 
-```
+```bash
 /forum_search forum_name:[论坛名称] author:[作者名]
 ```
 
 也可以排除特定作者的内容：
 
-```
+```bash
 /forum_search forum_name:[论坛名称] exclude_author:[排除作者名]
 ```
 
@@ -95,11 +96,12 @@ Python AND (错误 OR 异常) NOT "初学者问题"
 
 您可以指定搜索结果的排序方式：
 
-```
+```bash
 /forum_search forum_name:[论坛名称] sort_by:[排序方式]
 ```
 
 可用的排序方式包括：
+
 - `latest` - 按发布时间排序（最新的先显示）
 - `oldest` - 按发布时间排序（最早的先显示）
 - `most_replies` - 按回复数排序（最多回复先显示）
@@ -117,24 +119,28 @@ Python AND (错误 OR 异常) NOT "初学者问题"
 ## 实用搜索示例
 
 1. 查找某用户关于Python的所有问题：
-   ```
-   /forum_search forum_name:问题解答 query:Python author:用户名
-   ```
 
-2. 查找不包含初学者内容的高级教程：
-   ```
-   /forum_search forum_name:教程分享 query:"高级教程" NOT 初学者 tag1:编程
-   ```
+```bash
+/forum_search forum_name:问题解答 query:Python author:用户名
+```
 
-3. 按最多回复查找热门讨论：
-   ```
-   /forum_search forum_name:讨论区 sort_by:most_replies
-   ```
+1. 查找不包含初学者内容的高级教程：
 
-4. 查找最近一周的活跃帖子：
-   ```
-   /forum_search forum_name:公告 sort_by:last_active
-   ```
+```bash
+/forum_search forum_name:教程分享 query:"高级教程" NOT 初学者 tag1:编程
+```
+
+1. 按最多回复查找热门讨论：
+
+```bash
+/forum_search forum_name:讨论区 sort_by:most_replies
+```
+
+1. 查找最近一周的活跃帖子：
+
+```bash
+/forum_search forum_name:公告 sort_by:last_active
+```
 
 ## 性能考虑
 
@@ -154,7 +160,5 @@ Python AND (错误 OR 异常) NOT "初学者问题"
 3. **查看权限**：确保机器人有权限访问所有相关帖子
 4. **扩大范围**：尝试减少过滤器或使用更宽泛的关键词
 5. **更换标签**：尝试使用不同的标签组合
-
----
 
 如果您对搜索语法有任何疑问，可以在服务器中联系管理员获取帮助。 
