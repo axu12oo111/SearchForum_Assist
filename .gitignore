@@ -22,3 +22,7 @@ config_backup/
 # 操作系统文件
 .DS_Store
 Thumbs.db
+# 文档文件
+Augment-Memories-Fixed.md
+# 工具脚本
+validate_memories.py
